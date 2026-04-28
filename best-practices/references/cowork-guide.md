@@ -1,6 +1,6 @@
 # Claude Cowork 使用指南
 
-> **时效性说明（2026-03）：** Cowork 处于研究预览阶段，功能和限制可能变化较大。连接器列表、插件生态等信息建议联网确认。核心使用理念（Chat vs Cowork 的定位、任务描述技巧等）通常是稳定的。
+> **时效性说明（2026-04）：** Cowork 已正式发布（GA），并推出了企业级功能。连接器列表、插件生态等信息更新较快，建议联网确认。核心使用理念（Chat vs Cowork 的定位、任务描述技巧等）通常是稳定的。
 
 ## 目录
 1. [什么是 Cowork](#什么是-cowork)
@@ -14,7 +14,7 @@
 
 ## 什么是 Cowork
 
-Cowork 是 Claude Desktop 的 agentic 功能模式（研究预览）。与标准 Chat 模式不同，Cowork 可以：
+Cowork 是 Claude Desktop 的 agentic 功能模式（已正式发布）。与标准 Chat 模式不同，Cowork 可以：
 
 - **自主执行多步骤任务**：分析请求、拆分子任务、并行处理、交付结果
 - **直接读写本地文件**：无需上传下载
@@ -75,6 +75,31 @@ Cowork 可以创建：
 - **HTML/React 可视化**
 - **各种代码文件**
 
+### 内联可视化
+
+> **2026-04 新增**
+
+Claude 可以在回复中直接创建自定义图表、图形和可视化内容，无需生成独立文件。适合快速展示数据趋势、流程图、对比图表等。
+
+### Live Artifacts
+
+> **2026-04 新增**
+
+Live Artifacts 是可持久化的交互式面板，连接到你的应用和文件，自动刷新数据。适合：
+- 实时仪表盘（项目状态、团队指标）
+- 数据追踪器（销售漏斗、招聘管线）
+- 重复查看的报告（每日待办、每周摘要）
+
+与普通文件输出的区别：Live Artifacts 可以在多次会话中重新打开，并通过连接器拉取最新数据。
+
+### Computer Use
+
+> **2026-04 新增**
+
+Pro/Max 用户可以在 Cowork 中启用 Computer Use，让 Claude 直接操作屏幕上的应用——打开文件、运行开发工具、点击和导航，无需额外设置。
+
+在 Settings → Desktop app → Computer use 中启用。
+
 ### 定时任务
 
 ```
@@ -95,7 +120,7 @@ Cowork 可以将工作拆分给多个 sub-agents 并行处理。实测中，10 �
 
 ### 移动端访问
 
-Pro/Max 用户可以通过 Claude iOS 应用远程分配任务给 Cowork。
+Pro/Max 用户可以通过 Claude iOS/Android 应用远程分配任务给 Cowork。
 
 ---
 
@@ -129,6 +154,14 @@ Cowork 可以通过连接器接入外部应用：
 - Figma
 - Slack
 - 等等
+
+### 企业功能（2026-04 新增）
+
+Cowork 现已推出企业级支持：
+- **Analytics API**：Cowork 使用量分析
+- **OpenTelemetry 支持**：可观测性集成
+- **用户分组与自定义角色**：管理员可通过 SCIM 同步身份提供商，将用户组织为分组，并为每个分组分配自定义角色，控制可使用的 Claude 功能
+- **Claude Design**：Anthropic Labs 新产品，可与 Claude 协作创建视觉输出（设计、原型、幻灯片、one-pager）
 
 ---
 
@@ -227,8 +260,8 @@ Cowork 消耗的 token 较多，建议：
 
 Cowork 运行在虚拟机中，提供了与主系统的隔离。但：
 - Claude 确实可以访问你授权的本地文件
+- 启用 Computer Use 后，Claude 可以操作屏幕上的应用——审查操作时要特别留意
 - 审查所有操作后再批准，特别是涉及敏感文件时
-- 作为研究预览，agent 技术仍在发展中
 
 ---
 
@@ -236,4 +269,5 @@ Cowork 运行在虚拟机中，提供了与主系统的隔离。但：
 
 - Cowork 帮助中心：https://support.claude.com/en/articles/13345190
 - Cowork 产品页：https://claude.com/product/cowork
-- Cowork 博客公告：https://claude.com/blog/cowork-research-preview
+- Cowork 企业版公告：https://claude.com/blog/cowork-for-enterprise
+- Claude Design：https://www.anthropic.com/news/claude-opus-4-7

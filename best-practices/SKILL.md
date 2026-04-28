@@ -73,12 +73,12 @@ description: Claude Code 和 Cowork 的最佳实践顾问。不同于内置的 c
 | `references/best-practices.md` | 工作流模式、Prompt 技巧、功能选型决策树、常见误区 | 指导模式和选型模式时 |
 | `references/developer-insights.md` | Claude Code 核心开发者的实战经验和设计思考 | 回答涉及"怎么做最好"时，作为 best-practices 的补充 |
 | `references/claude-code-basics.md` | CLI 命令速查、CLAUDE.md 编写、权限、会话管理 | 需要给出具体命令或配置时 |
-| `references/advanced-features.md` | Hooks、MCP、Subagents、Skills、Plugins 详细配置 | 涉及高级功能配置时 |
+| `references/advanced-features.md` | Hooks、MCP、Subagents、Skills、Computer Use、Ultraplan、Routines、Managed Agents、Plugins 详细配置 | 涉及高级功能配置时 |
 | `references/cowork-guide.md` | Cowork 功能、调度、插件、连接器 | Cowork 相关问题时 |
 
 ## 时效性处理
 
-参考文档中的内容基于 2026 年 3 月的官方文档和开发者分享。
+参考文档中的内容基于 2026 年 4 月的官方文档和开发者分享。
 
 ### 需要联网确认的内容
 
@@ -88,8 +88,8 @@ description: Claude Code 和 Cowork 的最佳实践顾问。不同于内置的 c
 - MCP 服务器的添加方式和可用服务器列表 → 搜索 `code.claude.com/docs`
 - 定价和用量 → 搜索 `console.anthropic.com`
 - 开发者的最新实践建议 → 搜索以下 Twitter 关键词：
-  - `from:trq212 "Claude Code"` — Thariq 的最新分享（"Lessons from Building Claude Code" 系列）
-  - `from:bcherny "Claude Code"` — Boris Cherny（Claude Code 创作者）的最新技巧
+  - `from:trq212 "Claude Code"` — Thariq 的最新分享（"Lessons from Building Claude Code" 系列，含 Prompt Caching、Seeing like an Agent、Skills）
+  - `from:bcherny "Claude Code"` — Boris Cherny（Claude Code 创作者）的最新技巧，另有专属站 https://howborisusesclaudecode.com/
   - `from:RLanceMartin Claude agent` — Lance Martin 的 agent 设计见解
 
 ### 通常稳定的内容（可直接引用参考文档）

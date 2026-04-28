@@ -1,15 +1,20 @@
 # Claude Code 高级功能指南
 
-> **时效性说明（2026-03）：** MCP 服务器列表、Plugin 生态、Agent Teams 等功能更新较快。涉及具体配置命令时建议联网确认最新文档。Hooks 的事件类型和 JSON 格式、Skill 的 frontmatter 字段等通常是稳定的。
+> **时效性说明（2026-04）：** MCP 服务器列表、Plugin 生态、Agent Teams 等功能更新较快。涉及具体配置命令时建议联网确认最新文档。Hooks 的事件类型和 JSON 格式、Skill 的 frontmatter 字段等通常是稳定的。自 2026 年 4 月起，Claude CLI 已改为原生平台二进制（不再通过 Node.js 运行）。
 
 ## 目录
 1. [Hooks（生命周期钩子）](#hooks)
 2. [MCP（Model Context Protocol）](#mcp)
 3. [Subagents（子代理）](#subagents)
 4. [Skills（技能）](#skills)
-5. [Agent Teams](#agent-teams)
-6. [Plugins（插件）](#plugins)
-7. [GitHub Actions / GitLab CI](#cicd-集成)
+5. [Computer Use（CLI 端屏幕操作）](#computer-use)
+6. [Monitor 工具（后台事件监听）](#monitor-工具)
+7. [Ultraplan（云端规划）](#ultraplan)
+8. [Routines（模板化云端 Agent）](#routines)
+9. [Agent Teams](#agent-teams)
+10. [Plugins（插件）](#plugins)
+11. [Claude Managed Agents API](#managed-agents)
+12. [GitHub Actions / GitLab CI](#cicd-集成)
 
 ---
 
@@ -241,7 +246,7 @@ memory: project
 | `description` | 是 | 何时委托给此 agent |
 | `tools` | 否 | 可用工具白名单 |
 | `disallowedTools` | 否 | 工具黑名单 |
-| `model` | 否 | sonnet/opus/haiku/inherit |
+| `model` | 否 | sonnet/opus/haiku/inherit（Opus 4.7 现已可用） |
 | `permissionMode` | 否 | 权限模式 |
 | `maxTurns` | 否 | 最大轮次 |
 | `skills` | 否 | 启动时预加载的 skills |
@@ -250,7 +255,7 @@ memory: project
 | `memory` | 否 | 持久记忆范围：user/project/local |
 | `background` | 否 | 是否总是后台运行 |
 | `isolation` | 否 | 设为 `worktree` 在隔离 worktree 中运行 |
-| `effort` | 否 | 推理深度：low/medium/high/max |
+| `effort` | 否 | 推理深度：low/medium/high/xhigh/max（xhigh 为 Opus 4.7 默认） |
 
 ### 使用 Subagent
 
@@ -363,8 +368,116 @@ agent: Explore
 | `/batch <指令>` | 大规模并行变更（每个单元一个 worktree） |
 | `/claude-api` | 加载 Claude API 参考 |
 | `/debug [描述]` | 调试当前会话 |
-| `/loop [间隔] <prompt>` | 按间隔重复执行 prompt |
+| `/loop [间隔] <prompt>` | 按间隔重复执行 prompt（省略间隔时自适应节奏） |
 | `/simplify [焦点]` | 审查并简化最近的代码变更 |
+| `/ultrareview` | 云端代码审查：将分支分发给并行审查员，经过对抗性批评后返回验证报告 |
+| `/team-onboarding` | 将你的开发环境设置打包为可重放的入职指南 |
+| `/autofix-pr` | 从终端启用 PR 自动修复 |
+
+---
+
+## Computer Use
+
+> **2026-04 新增（研究预览）：** Claude Code CLI 现在支持 Computer Use——Claude 可以在你的终端中打开原生应用、点击 UI 元素、输入文本、截图验证，无需离开终端。
+
+### 适用场景
+
+- 测试原生应用的 UI 交互（打开浏览器验证页面渲染）
+- 调试视觉问题（截图对比、检查布局）
+- 自动化 GUI-only 工具（只有图形界面的工具）
+- 验证自身代码变更的视觉效果
+
+### 启用方式
+
+```bash
+# CLI 启用
+claude --computer-use
+
+# 或在会话中
+/computer-use
+```
+
+**平台支持：** 目前仅 macOS。Claude 可以打开应用、点击、输入、滚动、截图，并根据截图内容自主决定下一步操作。
+
+### 与验证驱动开发的结合
+
+Computer Use 最大的价值在于让 Claude 获得了**视觉验证**能力。以前你需要手动截图喂给 Claude，现在它可以自己截图、自己对比、自己修复——形成完整的视觉反馈闭环。
+
+**参考文档：** https://code.claude.com/docs/en/computer-use
+
+---
+
+## Monitor 工具
+
+> **2026-04 新增：** Monitor 工具让 Claude 在后台监听事件并实时响应，无需暂停对话。
+
+### 工作方式
+
+Monitor 将后台事件流注入到对话中，Claude 可以 tail 日志、监听变化并实时反应。
+
+### 适用场景
+
+- 监听构建日志，构建失败时自动分析错误
+- 监控测试运行输出，实时报告失败用例
+- 监听文件变化，触发相应操作
+
+### 相关：`/loop` 自适应间隔
+
+`/loop` 命令现在支持省略间隔参数，Claude 会根据任务自动调节执行节奏。
+
+---
+
+## Ultraplan
+
+> **2026-04 新增（Week 15）：** Ultraplan 将规划任务从本地 CLI 交给云端 Claude Code on the web 会话处理。
+
+### 工作流程
+
+1. 在本地 CLI 发起规划请求
+2. 云端自动创建环境，在 Plan Mode 下生成计划
+3. 在浏览器中打开计划，可对具体章节评论、要求修改
+4. 选择在云端执行或拉回本地执行
+
+### 使用方式
+
+```bash
+# 启动 ultraplan
+claude ultraplan "重构认证模块，支持 OAuth 2.0"
+```
+
+### 优势
+
+- 规划过程不阻塞本地终端，你可以继续其他工作
+- 浏览器编辑器支持结构化评论，比终端中讨论计划更高效
+- 首次运行会自动创建云端环境
+
+**参考文档：** https://code.claude.com/docs/en/ultraplan
+
+---
+
+## Routines
+
+> **2026-04 新增（Week 16）：** Routines 是模板化的云端 Agent，可通过事件触发，无需本地机器运行。
+
+### 核心概念
+
+在 Claude Code on the web 上定义一次：设置 prompt、指定可访问的仓库、配置需要的连接器，然后通过事件自动触发。
+
+### 支持的触发事件
+
+- **PR opened** — 新 PR 创建时自动触发（如自动代码审查）
+- **Release published** — 发布新版本时触发（如自动生成 changelog）
+- **Webhook** — 任意 webhook 事件触发
+
+### 与其他功能的区别
+
+| 功能 | 运行位置 | 触发方式 | 持续性 |
+|------|---------|---------|--------|
+| Hooks | 本地 CLI | 生命周期事件 | 仅当 CLI 运行时 |
+| Scheduled Tasks | 本地桌面应用 | 定时 | 需要应用保持打开 |
+| **Routines** | **云端** | **事件驱动** | **无需本地机器** |
+
+**参考文档：** https://code.claude.com/docs/en/routines
 
 ---
 
@@ -393,6 +506,34 @@ Plugins 将 skills、hooks、subagents 和 MCP 服务器打包为一个可安装
 ```
 
 对于类型语言，安装 code intelligence 插件可以给 Claude 精确的符号导航和编辑后自动错误检测。
+
+---
+
+## Managed Agents
+
+> **2026-04 新增（公测）：** Claude Managed Agents 是 Anthropic 提供的托管 Agent 服务，用于运行长时间自主 Agent 任务。
+
+### 核心概念
+
+Managed Agents 是一套完全托管的 Agent 基础设施，包含安全沙箱、内置工具和 Server-Sent Events 流式传输。你通过 API 创建 Agent、配置容器、运行会话。
+
+### API 组成
+
+| API | 用途 |
+|-----|------|
+| Sessions API | 运行有状态的 Agent 会话（云端容器中） |
+| Environments API | 配置 Agent 的容器模板 |
+| Agent Memory | Agent 的跨会话记忆（公测中） |
+
+### 适用场景
+
+- 需要长时间运行的自主 Agent 任务
+- 不想自建 Agent 基础设施
+- 需要安全沙箱隔离的 Agent 执行环境
+
+**注意：** 所有 API 请求需要 `managed-agents-2026-04-01` beta header。
+
+**参考文档：** https://docs.anthropic.com/en/docs/agents/managed-agents
 
 ---
 
@@ -428,7 +569,12 @@ Claude Code 也支持 GitLab CI/CD 集成，用于自动化代码审查和 issue
 - MCP：https://code.claude.com/docs/en/mcp
 - Subagents：https://code.claude.com/docs/en/sub-agents
 - Skills：https://code.claude.com/docs/en/skills
+- Computer Use：https://code.claude.com/docs/en/computer-use
+- Ultraplan：https://code.claude.com/docs/en/ultraplan
+- Routines：https://code.claude.com/docs/en/routines
 - Agent Teams：https://code.claude.com/docs/en/agent-teams
 - Plugins：https://code.claude.com/docs/en/plugins
+- Managed Agents：https://docs.anthropic.com/en/docs/agents/managed-agents
 - 功能概览：https://code.claude.com/docs/en/features-overview
 - GitHub Actions：https://code.claude.com/docs/en/github-actions
+- What's New：https://code.claude.com/docs/en/whats-new

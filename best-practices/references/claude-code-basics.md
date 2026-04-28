@@ -1,6 +1,6 @@
 # Claude Code 基础指南
 
-> **时效性说明（2026-03）：** 本文档中的 CLI 命令和 flags 可能随版本更新变化。如果用户问到具体命令格式，建议联网确认 `code.claude.com/docs/en/cli-reference` 的最新版本。安装方式、会话管理、CLAUDE.md 编写原则等内容通常是稳定的。
+> **时效性说明（2026-04）：** 本文档中的 CLI 命令和 flags 可能随版本更新变化。如果用户问到具体命令格式，建议联网确认 `code.claude.com/docs/en/cli-reference` 的最新版本。自 2026 年 4 月 Week 16 起，`claude` CLI 已改为原生平台二进制（不再通过 Node.js/bundled JS 运行），启动更快。安装方式、会话管理、CLAUDE.md 编写原则等内容通常是稳定的。
 
 ## 目录
 1. [安装与更新](#安装与更新)
@@ -75,7 +75,7 @@ claude
 | Flag | 说明 | 示例 |
 |------|------|------|
 | `--model` | 选择模型（sonnet/opus/完整名称） | `claude --model opus` |
-| `--effort` | 推理深度：low/medium/high/max | `claude --effort high` |
+| `--effort` | 推理深度：low/medium/high/xhigh/max（Opus 4.7 默认 xhigh，其他模型默认 high） | `claude --effort xhigh` |
 | `--bare` | 精简模式：跳过自动发现，启动更快 | `claude --bare -p "query"` |
 
 ### 系统提示
@@ -123,6 +123,7 @@ claude
 |------|------|
 | `--add-dir ../other-project` | 添加额外工作目录 |
 | `--chrome` | 启用 Chrome 浏览器集成 |
+| `--computer-use` | 启用 Computer Use（Claude 可操作屏幕，研究预览） |
 | `--mcp-config ./mcp.json` | 加载 MCP 配置文件 |
 | `--agent my-agent` | 以指定 agent 身份运行整个会话 |
 | `--remote "task"` | 在 claude.ai 创建远程会话 |
@@ -358,12 +359,18 @@ Claude 自动积累跨会话的知识，存储在 `~/.claude/projects/<project>/
 | `/resume` | 选择并恢复会话 |
 | `/rename name` | 重命名当前会话 |
 | `/rewind` | 回溯到检查点 |
-| `/effort` | 调整推理深度 |
+| `/effort` | 调整推理深度（无参数时打开交互式箭头键滑块） |
 | `/model` | 切换模型 |
 | `/btw question` | 侧边快速提问（不进入上下文） |
 | `/batch instruction` | 大规模并行变更 |
 | `/debug` | 调试当前会话 |
 | `/statusline` | 配置状态栏 |
+| `/usage` | 查看 token 消耗分布（并行会话/subagents/cache miss/长上下文） |
+| `/tui` | 切换经典/无闪烁渲染模式 |
+| `/ultrareview` | 云端代码审查（分发给并行审查员） |
+| `/ultraplan` | 云端规划（在浏览器中编辑和评论计划） |
+| `/team-onboarding` | 将环境设置打包为可重放入职指南 |
+| `/autofix-pr` | 启用 PR 自动修复 |
 
 ---
 

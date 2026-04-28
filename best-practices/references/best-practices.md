@@ -133,6 +133,13 @@ Claude 在能自我验证时表现显著更好。提供测试、截图或预期�
 
 **何时跳过规划：** 如果你能用一句话描述 diff（修错别字、添加日志行、重命名变量），直接让 Claude 做就好。
 
+**进阶：Ultraplan（2026-04 新增）**
+对于大型规划任务，可以用 Ultraplan 把规划交给云端处理，本地终端不被阻塞：
+```bash
+claude ultraplan "重构认证模块，支持 OAuth 2.0"
+```
+计划生成后在浏览器中打开，可对具体章节评论和修改，再选择在云端或本地执行。
+
 ### 3. 提供具体上下文
 
 | 策略 | 不好的写法 | 好的写法 |
@@ -170,7 +177,9 @@ Claude 在能自我验证时表现显著更好。提供测试、截图或预期�
 
 ### 使用「ultrathink」关键词
 
-在 Opus 4.6 和 Sonnet 4.6 上，在 prompt 中包含「ultrathink」会将该轮的推理深度设为 high，适合需要深度思考的一次性任务。
+在 Opus 4.6/4.7 和 Sonnet 4.6 上，在 prompt 中包含「ultrathink」会将该轮的推理深度设为 high，适合需要深度思考的一次性任务。
+
+> **2026-04 更新：** Opus 4.7 新增 `xhigh` effort 级别（介于 high 和 max 之间），是 Opus 4.7 的默认 effort。其他模型默认 effort 已从 medium 调整为 `high`。可通过 `/effort` 命令使用交互式箭头键滑块调整。
 
 ### 用 `/btw` 做侧边快速提问
 
@@ -200,6 +209,7 @@ Claude 在能自我验证时表现显著更好。提供测试、截图或预期�
 - **`/compact` 主动压缩**：可以带指令，如 `/compact 保留所有修改过的文件路径`
 - **在 CLAUDE.md 中写压缩规则**：`当压缩时，始终保留修改文件的完整列表和所有测试命令`
 - **用 `/statusline` 追踪上下文用量**：实时可见，避免被动触发自动压缩
+- **用 `/usage` 追踪 token 消耗来源**（2026-04 新增）：显示过去 24 小时的消耗分布——并行会话、subagents、cache miss、长上下文各占多少，附带优化建议
 
 ---
 
@@ -242,6 +252,26 @@ for file in $(cat files.txt); do
   claude -p "将 $file 从 React 迁移到 Vue。返回 OK 或 FAIL。" \
     --allowedTools "Edit,Bash(git commit *)"
 done
+```
+
+### Routines（2026-04 新增）
+
+Routines 是模板化的云端 Agent，在 Claude Code on the web 上定义一次，通过 PR、release、webhook 等事件自动触发，无需本地机器运行：
+
+```
+# 示例：PR 打开时自动代码审查
+在 Claude Code on the web 创建 Routine：
+- Prompt: "审查这个 PR 的安全和性能问题"
+- 触发: PR opened
+- 仓库: my-org/my-repo
+```
+
+### /ultrareview（2026-04 新增）
+
+云端代码审查——将分支分发给多个并行审查员，经过对抗性批评验证后返回报告，终端保持空闲：
+
+```bash
+/ultrareview
 ```
 
 ### 作为 Unix 工具使用
